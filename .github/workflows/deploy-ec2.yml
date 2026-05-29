@@ -1,0 +1,73 @@
+name: Deploy EC2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ec2
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Pull repository on EC2
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Configure SSH
+        shell: bash
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_PORT: ${{ secrets.EC2_PORT }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_KNOWN_HOSTS: ${{ secrets.EC2_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/ec2_deploy_key
+          chmod 600 ~/.ssh/ec2_deploy_key
+
+          if [ -n "${EC2_KNOWN_HOSTS}" ]; then
+            printf '%s\n' "$EC2_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -p "${EC2_PORT:-22}" -H "$EC2_HOST" >> ~/.ssh/known_hosts
+          fi
+
+      - name: Deploy on EC2
+        shell: bash
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_PORT: ${{ secrets.EC2_PORT }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_APP_PATH: ${{ secrets.EC2_APP_PATH }}
+          DEPLOY_BRANCH: main
+        run: |
+          set -euo pipefail
+
+          ssh -i ~/.ssh/ec2_deploy_key \
+            -p "${EC2_PORT:-22}" \
+            -o IdentitiesOnly=yes \
+            "$EC2_USER@$EC2_HOST" \
+            "APP_PATH='$EC2_APP_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' bash -s" <<'REMOTE'
+          set -euo pipefail
+
+          cd "$APP_PATH"
+
+          git fetch origin "$DEPLOY_BRANCH"
+          git checkout "$DEPLOY_BRANCH"
+          git pull --ff-only origin "$DEPLOY_BRANCH"
+
+          docker compose up -d --build
+          docker compose exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader
+          docker compose exec -T app php artisan migrate --force
+          docker compose exec -T app php artisan config:clear
+          docker compose exec -T app php artisan route:clear
+          docker compose exec -T app php artisan view:clear
+          REMOTE

@@ -1,3 +1,46 @@
+## Ambiente Docker
+
+Suba o projeto completo com:
+
+```bash
+docker compose up -d --build
+```
+
+A aplicacao fica em `http://localhost:8000`, o Vite em `http://localhost:5173` e o Mailpit em `http://localhost:8025`.
+
+Comandos uteis:
+
+```bash
+docker compose exec app php artisan migrate
+docker compose exec app php artisan tinker
+docker compose exec app composer install
+docker compose exec node npm install
+```
+
+Servicos configurados:
+
+- `nginx`: servidor HTTP da aplicacao.
+- `app`: PHP-FPM 8.4 com extensoes necessarias para Laravel.
+- `mysql`: banco MySQL 8.4, exposto no host em `3307`.
+- `redis`: Redis, exposto no host em `6381`.
+- `mailpit`: caixa de e-mail local, interface web em `8025`.
+- `node`: Vite em modo desenvolvimento.
+
+## Deploy no EC2
+
+O workflow `.github/workflows/deploy-ec2.yml` faz deploy quando houver push na branch `main` ou quando executado manualmente em `Actions > Deploy EC2`.
+
+Configure estes secrets no GitHub em `Settings > Secrets and variables > Actions`:
+
+- `EC2_HOST`: IP publico ou DNS do EC2.
+- `EC2_USER`: usuario SSH, por exemplo `ubuntu` ou `ec2-user`.
+- `EC2_SSH_KEY`: chave privada SSH com acesso ao EC2.
+- `EC2_APP_PATH`: caminho absoluto do projeto no EC2, por exemplo `/var/www/projeto-eventos`.
+- `EC2_PORT`: porta SSH, opcional. Se ficar vazio, usa `22`.
+- `EC2_KNOWN_HOSTS`: opcional. Se ficar vazio, o workflow usa `ssh-keyscan`.
+
+O repositorio precisa estar clonado no `EC2_APP_PATH` e o arquivo `.env` precisa existir no servidor.
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
@@ -7,59 +50,6 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
 ## License
 
