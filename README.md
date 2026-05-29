@@ -1,4 +1,4 @@
-## Ambiente Docker
+## Ambiente Docker - Local
 
 Suba o projeto completo com:
 
