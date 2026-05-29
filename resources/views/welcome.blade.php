@@ -15,7 +15,7 @@
         @else
             <h2>Próximos Eventos:</h2>
         @endif
-        <p class="subtitile">Vejas os eventos dos próximos dias</p>
+        <p class="subtitile">Vejas os eventos dos próximos dias:</p>
         <div id="cards-container" class="row">
             @foreach ($events as $event)
                 <div class="card col-md-3">
