@@ -49,6 +49,7 @@ O repositorio precisa estar clonado no `EC2_APP_PATH` e o arquivo `.env` precisa
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
+<a Rafael Castro> </a>
 
 
 ## License
